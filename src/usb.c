@@ -760,6 +760,24 @@ int usb_process_timeout(int msec)
 	return 0;
 }
 
+void usb_set_hi_power(struct usb_device *dev) {
+	usbmuxd_log(LL_INFO, "[!] ipad_charge: Enabling high power on port: %d-%d", dev->bus, dev->address);
+	int charge_res = 0;
+	int interfaceNumber = 0;
+	if((charge_res = libusb_claim_interface(dev->dev, interfaceNumber)) == 0) {
+        if ((charge_res = libusb_control_transfer(dev->dev, (LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT), 0x40, 500, 1600, NULL, 0, 2000)) < 0) {
+			usbmuxd_log(LL_ERROR, "[!] ipad_charge: Unable to send command: error %d [%s]", charge_res, libusb_strerror(charge_res));
+        } else {
+			usbmuxd_log(LL_INFO, "[!] ipad_charge: High power set successfully on port: %d-%d", dev->bus, dev->address);
+		}
+		if ((charge_res = libusb_release_interface(dev->dev, interfaceNumber)) != 0) {
+			usbmuxd_log(LL_ERROR, "[!] ipad_charge: Failed to release interface %d for device %d-%d: %d", interfaceNumber, dev->bus, dev->address, charge_res);
+		}
+    } else {
+		usbmuxd_log(LL_ERROR, "[!] ipad_charge: Could not claim interface %d for device %d-%d: %d [%s]", interfaceNumber, dev->bus, dev->address, charge_res, libusb_strerror(charge_res));
+	}
+}
+
 #ifdef HAVE_LIBUSB_HOTPLUG_API
 static libusb_hotplug_callback_handle usb_hotplug_cb_handle;
 

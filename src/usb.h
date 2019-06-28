@@ -62,5 +62,5 @@ int usb_discover(void);
 void usb_autodiscover(int enable);
 int usb_process(void);
 int usb_process_timeout(int msec);
-
+void usb_set_hi_power(struct usb_device *dev);
 #endif

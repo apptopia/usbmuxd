@@ -954,6 +954,7 @@ void client_device_add(struct device_info *dev)
 {
 	pthread_mutex_lock(&client_list_mutex);
 	usbmuxd_log(LL_DEBUG, "client_device_add: id %d, location 0x%x, serial %s", dev->id, dev->location, dev->serial);
+	device_set_hi_power(dev->id);
 	device_set_visible(dev->id);
 	FOREACH(struct mux_client *client, &client_list) {
 		if(client->state == CLIENT_LISTEN)
