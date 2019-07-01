@@ -49,6 +49,9 @@
 
 struct usb_device;
 
+
+struct usb_device * copy_usb_device(struct usb_device *dev);
+
 int usb_init(void);
 void usb_shutdown(void);
 const char *usb_get_serial(struct usb_device *dev);

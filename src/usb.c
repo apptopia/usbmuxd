@@ -71,6 +71,15 @@ static int devlist_failures;
 static int device_polling;
 static int device_hotplug = 1;
 
+struct usb_device * copy_usb_device(struct usb_device *dev) {
+	struct usb_device *devcopy = malloc(sizeof(struct usb_device));
+
+	memcpy(devcopy, dev, sizeof(struct usb_device));
+
+	return devcopy;
+}
+
+
 static void usb_disconnect(struct usb_device *dev)
 {
 	if(!dev->dev) {
@@ -765,6 +774,8 @@ void usb_set_hi_power(struct usb_device *dev) {
 	int charge_res = 0;
 	int interfaceNumber = 0;
 	if((charge_res = libusb_claim_interface(dev->dev, interfaceNumber)) == 0) {
+		usbmuxd_log(LL_INFO, "[!] ipad_charge: Interface: %d claimed successfully for device %d-%d", interfaceNumber, dev->bus, dev->address);
+		usbmuxd_log(LL_INFO, "[!] ipad_charge: Sending payload on interface %d for device %d-%d", interfaceNumber, dev->bus, dev->address);
         if ((charge_res = libusb_control_transfer(dev->dev, (LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT), 0x40, 500, 1600, NULL, 0, 2000)) < 0) {
 			usbmuxd_log(LL_ERROR, "[!] ipad_charge: Unable to send command: error %d [%s]", charge_res, libusb_strerror(charge_res));
         } else {

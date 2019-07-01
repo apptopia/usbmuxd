@@ -893,12 +893,36 @@ void device_set_visible(int device_id)
 	pthread_mutex_unlock(&device_list_mutex);
 }
 
+static void* set_hi_power_thread(void* userdata) {
+	struct usb_device *device = (struct usb_device*)userdata;
+	
+	usb_set_hi_power(device);
+	return NULL;
+}
+
+void start_hi_power_thread(struct usb_device *usbdev);
+void start_hi_power_thread(struct usb_device *usbdev)
+{
+	struct usb_device *devcopy = copy_usb_device(usbdev);
+	pthread_t th;
+	pthread_attr_t attr;
+
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+	int perr = pthread_create(&th, &attr, set_hi_power_thread, devcopy);
+	if (perr != 0) {
+		free(devcopy);
+		usbmuxd_log(LL_ERROR, "ERROR: failed to start hi_power thread for device: %s (%d).", strerror(perr), perr);
+	}
+}
+
 void device_set_hi_power(int device_id)
 {
 	pthread_mutex_lock(&device_list_mutex);
 	FOREACH(struct mux_device *dev, &device_list) {
 		if(dev->id == device_id) {
-			usb_set_hi_power(dev->usbdev);
+			start_hi_power_thread(dev->usbdev);
 			break;
 		}
 	} ENDFOREACH
