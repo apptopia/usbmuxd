@@ -919,14 +919,14 @@ void start_hi_power_thread(struct usb_device *usbdev)
 
 void device_set_hi_power(int device_id)
 {
-	pthread_mutex_lock(&device_list_mutex);
-	FOREACH(struct mux_device *dev, &device_list) {
-		if(dev->id == device_id) {
-			start_hi_power_thread(dev->usbdev);
-			break;
-		}
-	} ENDFOREACH
-	pthread_mutex_unlock(&device_list_mutex);
+	// pthread_mutex_lock(&device_list_mutex);
+	// FOREACH(struct mux_device *dev, &device_list) {
+	// 	if(dev->id == device_id) {
+	// 		start_hi_power_thread(dev->usbdev);
+	// 		break;
+	// 	}
+	// } ENDFOREACH
+	// pthread_mutex_unlock(&device_list_mutex);
 }
 
 void device_set_preflight_cb_data(int device_id, void* data)

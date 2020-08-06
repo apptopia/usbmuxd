@@ -794,6 +794,8 @@ static libusb_hotplug_callback_handle usb_hotplug_cb_handle;
 
 static int usb_hotplug_cb(libusb_context *ctx, libusb_device *device, libusb_hotplug_event event, void *user_data)
 {
+	usbmuxd_log(LL_WARNING, "usb_hotplug_cb!");
+
 	if (LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED == event) {
 		if (device_hotplug) {
 			usb_device_add(device);
@@ -854,6 +856,8 @@ int usb_init(void)
 	return res;
 }
 
+// after main loop exit the following seq is called
+// device_kill_connections() -> usb_shutdown() ->  device_shutdown() -> client_shutdown()
 void usb_shutdown(void)
 {
 	usbmuxd_log(LL_DEBUG, "usb_shutdown");

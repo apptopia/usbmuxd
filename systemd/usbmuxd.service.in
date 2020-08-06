@@ -1,7 +1,14 @@
 [Unit]
 Description=Socket daemon for the usbmux protocol used by Apple devices
 Documentation=man:usbmuxd(8)
+AssertPathExists=@sbindir@/usbmuxd
 
 [Service]
+Type=simple
 ExecStart=@sbindir@/usbmuxd --user usbmux --systemd
+Restart=always
 PIDFile=@localstatedir@/run/usbmuxd.pid
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=usbmuxd
+MemoryAccounting=true

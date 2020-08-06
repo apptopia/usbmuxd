@@ -126,13 +126,13 @@ case ${host_os} in
     AC_SUBST([udevrulesdir], [$with_udevrulesdir])
     AC_DEFINE(HAVE_UDEV, 1, [Define to enable udev support])
     activation_method="systemd"
-    if test "x$with_systemd" != "xyes"; then
-      echo "*** Note: support for systemd activation has been disabled, using udev activation instead ***"
-      activation_method="udev"
-    else
+    #if test "x$with_systemd" != "xyes"; then
+    #  echo "*** Note: support for systemd activation has been disabled, using udev activation instead ***"
+    #  activation_method="udev"
+    #else
       AC_DEFINE(HAVE_SYSTEMD, 1, [Define to enable systemd support])
       SYSTEMD_SUB=systemd
-    fi
+    #fi
     ;;
 esac
 AM_CONDITIONAL(WIN32, test x$win32 = xtrue)
