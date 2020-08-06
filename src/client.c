@@ -235,8 +235,16 @@ void client_close(struct mux_client *client)
 		device_abort_connect(client->connect_device, client);
 	}
 	close(client->fd);
-	free(client->ob_buf);
-	free(client->ib_buf);
+	if (client->ob_buf != NULL) {
+		free(client->ob_buf);
+		client->ob_buf = NULL;
+		client->ob_capacity = 0;
+	}
+	if (client->ib_buf != NULL) {
+                free(client->ib_buf);
+                client->ib_buf = NULL;
+		client->ib_capacity = 0;
+	}
 	plist_free(client->info);
 
 	pthread_mutex_lock(&client_list_mutex);

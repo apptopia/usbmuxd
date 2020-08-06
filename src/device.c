@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#define _DEFAULT_SOURCE
 #define _BSD_SOURCE
 
 #ifdef HAVE_CONFIG_H
@@ -344,10 +345,8 @@ static void connection_teardown(struct mux_connection *conn)
 			client_close(conn->client);
 		}
 	}
-	if(conn->ib_buf)
-		free(conn->ib_buf);
-	if(conn->ob_buf)
-		free(conn->ob_buf);
+	free(conn->ib_buf);
+	free(conn->ob_buf);
 	collection_remove(&conn->dev->connections, conn);
 	free(conn);
 }
@@ -394,6 +393,8 @@ int device_start_connect(int device_id, uint16_t dport, struct mux_client *clien
 	res = send_tcp(conn, TH_SYN, NULL, 0);
 	if(res < 0) {
 		usbmuxd_log(LL_ERROR, "Error sending TCP SYN to device %d (%d->%d)", dev->id, sport, dport);
+		free(conn->ib_buf);
+		free(conn->ob_buf);
 		free(conn);
 		return -RESULT_CONNREFUSED; //bleh
 	}
@@ -969,7 +970,7 @@ int device_get_list(int include_hidden, struct device_info **devices)
 	*devices = malloc(sizeof(struct device_info) * dev_list.capacity);
 	struct device_info *p = *devices;
 
-	FOREACH(struct mux_device *dev, &device_list) {
+	FOREACH(struct mux_device *dev, &dev_list) {
 		if((dev->state == MUXDEV_ACTIVE) && (include_hidden || dev->visible)) {
 			p->id = dev->id;
 			p->serial = usb_get_serial(dev->usbdev);
